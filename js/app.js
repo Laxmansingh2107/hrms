@@ -1,26 +1,24 @@
+// js/app.js
 document.addEventListener("DOMContentLoaded", () => {
-
-  let employees = JSON.parse(localStorage.getItem("employees")) || [];
-  let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+  let employees = Store.getEmployees();
+  let attendance = Store.getAttendance();
 
   const content = document.getElementById("content");
-  const menuItems = document.querySelectorAll(".sidebar li");
+  const menu = document.querySelectorAll(".sidebar li");
 
-  menuItems.forEach(item => {
-    item.onclick = () => {
-      menuItems.forEach(i => i.classList.remove("active"));
-      item.classList.add("active");
-      loadPage(item.dataset.page);
+  menu.forEach(li => {
+    li.onclick = () => {
+      menu.forEach(m => m.classList.remove("active"));
+      li.classList.add("active");
+      loadPage(li.dataset.page);
     };
   });
 
   loadPage("dashboard");
 
-  /* ================= DASHBOARD ================= */
-
   function loadPage(page) {
     if (page === "dashboard") renderDashboard();
-    if (page === "employees") renderEmployeeList();
+    if (page === "employees") renderEmployeeMaster();
     if (page === "attendance") renderAttendance();
   }
 
@@ -39,9 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= EMPLOYEE MASTER ================= */
-
-  function renderEmployeeList() {
+  function renderEmployeeMaster() {
     content.innerHTML = `
       <h3>Employee Master</h3>
       <button id="addEmp">Add Employee</button>
@@ -56,18 +52,17 @@ document.addEventListener("DOMContentLoaded", () => {
             <th>Basic</th>
           </tr>
         </thead>
-        <tbody id="empTable"></tbody>
+        <tbody id="empBody"></tbody>
       </table>
     `;
 
-    document.getElementById("addEmp").onclick = renderAddEmployeeForm;
+    document.getElementById("addEmp").onclick = renderAddEmployee;
     drawEmployeeTable();
   }
 
   function drawEmployeeTable() {
-    const tbody = document.getElementById("empTable");
+    const tbody = document.getElementById("empBody");
     tbody.innerHTML = "";
-
     employees.forEach(emp => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -82,18 +77,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderAddEmployeeForm() {
+  function renderAddEmployee() {
     content.innerHTML = `
       <h3>Add Employee</h3>
 
       <div class="form-row">
         <label>Name</label>
-        <input id="name">
+        <input id="name" />
       </div>
 
       <div class="form-row">
         <label>Joining Date</label>
-        <input type="date" id="joiningDate">
+        <input type="date" id="joiningDate" />
       </div>
 
       <div class="form-row">
@@ -106,24 +101,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="form-row">
         <label>Basic Salary</label>
-        <input type="number" id="basic">
+        <input type="number" id="basic" />
       </div>
 
       <button id="save">Save</button>
-      <button id="cancel">Cancel</button>
+      <button id="cancel" class="secondary">Cancel</button>
     `;
 
     joiningDate.value = new Date().toISOString().split("T")[0];
 
     document.getElementById("save").onclick = saveEmployee;
-    document.getElementById("cancel").onclick = renderEmployeeList;
+    document.getElementById("cancel").onclick = renderEmployeeMaster;
   }
 
   function saveEmployee() {
-    if (!name.value || !basic.value) {
-      alert("Name and Basic Salary are mandatory");
-      return;
-    }
+    if (!name.value || !basic.value) return;
 
     const empId = "EMP" + String(employees.length + 1).padStart(3, "0");
 
@@ -135,8 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
       basic: Number(basic.value)
     });
 
-    localStorage.setItem("employees", JSON.stringify(employees));
-    renderEmployeeList();
+    Store.saveEmployees(employees);
+    renderEmployeeMaster();
   }
 
   function renderEmployeeProfile(empId) {
@@ -148,15 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <p><b>Name:</b> ${emp.name}</p>
       <p><b>Joining Date:</b> ${emp.joiningDate}</p>
       <p><b>Status:</b> ${emp.status}</p>
-      <p><b>Basic Salary:</b> ₹${emp.basic}</p>
-
-      <button id="back">Back to Employee List</button>
+      <p><b>Basic:</b> ₹${emp.basic}</p>
+      <button id="back" class="secondary">Back</button>
     `;
 
-    document.getElementById("back").onclick = renderEmployeeList;
+    document.getElementById("back").onclick = renderEmployeeMaster;
   }
-
-  /* ================= ATTENDANCE ================= */
 
   function renderAttendance() {
     content.innerHTML = `
@@ -164,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="form-row">
         <label>Date</label>
-        <input type="date" id="attDate">
+        <input type="date" id="attDate" />
       </div>
 
       <div class="form-row">
@@ -174,12 +163,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="form-row">
         <label>In Time</label>
-        <input type="time" id="inTime">
+        <input type="time" id="inTime" />
       </div>
 
       <div class="form-row">
         <label>Out Time</label>
-        <input type="time" id="outTime">
+        <input type="time" id="outTime" />
       </div>
 
       <button id="saveAtt">Save Attendance</button>
@@ -196,38 +185,35 @@ document.addEventListener("DOMContentLoaded", () => {
             <th>OT</th>
           </tr>
         </thead>
-        <tbody id="attTable"></tbody>
+        <tbody id="attBody"></tbody>
       </table>
     `;
 
     attDate.value = new Date().toISOString().split("T")[0];
-    populateAttendanceEmployees();
+    populateEmployeeDropdown();
     drawAttendanceTable();
 
     document.getElementById("saveAtt").onclick = saveAttendance;
   }
 
-  function populateAttendanceEmployees() {
-    attEmp.innerHTML = employees.map(e =>
-      `<option value="${e.empId}">${e.name}</option>`
-    ).join("");
+  function populateEmployeeDropdown() {
+    const sel = document.getElementById("attEmp");
+    sel.innerHTML = employees.map(e => `<option value="${e.empId}">${e.name}</option>`).join("");
   }
 
   function saveAttendance() {
-    if (!inTime.value || !outTime.value) {
-      alert("In Time and Out Time are mandatory");
-      return;
-    }
+    if (!inTime.value || !outTime.value) return;
 
     const start = toMinutes(inTime.value);
-    const end = toMinutes(outTime.value < inTime.value ? outTime.value : outTime.value);
-    const diff = ((end + (end < start ? 1440 : 0)) - start) / 60;
+    const end = toMinutes(outTime.value);
+    let diff = end - start;
+    if (diff < 0) diff += 1440;
 
-    const workHours = Math.min(8, diff);
-    const otHours = Math.max(0, diff - 8);
+    const workHours = Math.min(8, diff / 60);
+    const otHours = Math.max(0, diff / 60 - 8);
 
-    attendance = attendance.filter(a =>
-      !(a.empId === attEmp.value && a.date === attDate.value)
+    attendance = attendance.filter(
+      a => !(a.empId === attEmp.value && a.date === attDate.value)
     );
 
     attendance.push({
@@ -239,14 +225,13 @@ document.addEventListener("DOMContentLoaded", () => {
       otHours: Number(otHours.toFixed(2))
     });
 
-    localStorage.setItem("attendance", JSON.stringify(attendance));
+    Store.saveAttendance(attendance);
     drawAttendanceTable();
   }
 
   function drawAttendanceTable() {
-    const tbody = document.getElementById("attTable");
+    const tbody = document.getElementById("attBody");
     tbody.innerHTML = "";
-
     attendance.forEach(a => {
       const emp = employees.find(e => e.empId === a.empId);
       tbody.innerHTML += `
@@ -266,5 +251,4 @@ document.addEventListener("DOMContentLoaded", () => {
     const [h, m] = t.split(":").map(Number);
     return h * 60 + m;
   }
-
 });

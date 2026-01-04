@@ -1,3 +1,4 @@
+alert("app.js loaded");
 window.loadPage = function (page) {
   const content = document.getElementById("content");
 

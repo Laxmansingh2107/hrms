@@ -1,31 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>HRMS | Kosher Infrastructure Pvt. Ltd.</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>HRMS | Kosher Infrastructure Pvt Ltd</title>
+
+  <!-- Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    body { font-family: Arial; margin: 0; }
+    header { background:#1f2937; color:#fff; padding:15px; }
+    .container { display:flex; }
+    .sidebar { width:220px; background:#e5e7eb; min-height:100vh; }
+    .sidebar li { list-style:none; padding:12px; cursor:pointer; }
+    .sidebar li:hover { background:#d1d5db; }
+    #content { padding:20px; width:100%; }
+    table { border-collapse:collapse; width:100%; }
+    th,td { border:1px solid #999; padding:6px; }
+  </style>
 </head>
 <body>
 
 <header>
-  <h1>Kosher Infrastructure Pvt. Ltd.</h1>
-  <p>HR & Workforce Management System</p>
+  <h2>Kosher Infrastructure Pvt Ltd</h2>
+  <p>HRMS & Payroll System</p>
 </header>
 
 <div class="container">
-  <nav class="sidebar">
-    <ul>
-      <li data-page="dashboard">Dashboard</li>
-      <li data-page="employees">Employees</li>
-      <li data-page="attendance">Attendance</li>
-      <li data-page="payroll">Payroll</li>
-      <li data-page="reports">Reports</li>
-    </ul>
-  </nav>
-
-  <main class="content" id="content"></main>
+  <ul class="sidebar">
+    <li data-page="employees">Employee Master</li>
+    <li data-page="attendance">Attendance</li>
+    <li data-page="payroll">Payroll</li>
+  </ul>
+  <main id="content"></main>
 </div>
 
-<script src="js/app.js" defer></script>
+<script src="js/app.js"></script>
 </body>
 </html>

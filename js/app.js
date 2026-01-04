@@ -90,8 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         <button type="submit">Save</button>
       </form>
-
-      <div id="employeeList"></div>
     `;
 
     document

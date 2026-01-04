@@ -1,43 +1,96 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   background: #f4f6f8;
 }
 
 header {
-  background: #1f3c88;
+  background: #1e3a8a;
   color: #fff;
-  padding: 15px;
+  padding: 16px 24px;
 }
 
-.container {
+.brand h2 {
+  margin: 0;
+}
+.brand span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.layout {
   display: flex;
 }
 
 .sidebar {
   width: 220px;
-  background: #2c2c2c;
-  color: #fff;
-  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #ddd;
+  min-height: calc(100vh - 70px);
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar li {
-  padding: 15px;
-  border-bottom: 1px solid #444;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+  background: #e0e7ff;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+#content {
+  padding: 24px;
+  width: 100%;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+button {
+  padding: 6px 12px;
+  margin-right: 6px;
   cursor: pointer;
 }
 
-.sidebar li:hover {
-  background: #444;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: #fff;
 }
 
-.content {
-  padding: 20px;
-  flex: 1;
-  background: #fff;
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 14px;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+}
+
+.form-row {
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+input, select {
+  padding: 6px;
+  width: 300px;
 }

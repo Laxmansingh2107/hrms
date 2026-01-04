@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Global state
   // =========================
   let employees = JSON.parse(localStorage.getItem("employees")) || [];
+  let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
 
   const content = document.getElementById("content");
 
@@ -32,11 +33,43 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
     if (page === "attendance") {
-      content.innerHTML = `
-        <h2>Attendance</h2>
-        <p>Attendance module coming next.</p>
-      `;
-    }
+  content.innerHTML = `
+    <h2>Attendance</h2>
+
+    <form id="attendanceForm">
+      <label>Date</label><br />
+      <input type="date" id="attDate" required /><br /><br />
+
+      <label>Employee</label><br />
+      <select id="attEmployee"></select><br /><br />
+
+      <label>Status</label><br />
+      <select id="attStatus">
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
+        <option value="Leave">Leave</option>
+      </select><br /><br />
+
+      <label>Work Hours</label><br />
+      <input type="number" id="attHours" value="8" /><br /><br />
+
+      <label>Overtime Hours</label><br />
+      <input type="number" id="attOT" value="0" /><br /><br />
+
+      <button type="submit">Save Attendance</button>
+    </form>
+
+    <h3>Attendance Register</h3>
+    <div id="attendanceList"></div>
+  `;
+
+  populateEmployeeDropdown();
+  document
+    .getElementById("attendanceForm")
+    .addEventListener("submit", saveAttendance);
+
+  displayAttendance();
+}
 
     if (page === "payroll") {
       content.innerHTML = `
@@ -127,3 +160,61 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 });
+function populateEmployeeDropdown() {
+  const dropdown = document.getElementById("attEmployee");
+  dropdown.innerHTML = "";
+
+  employees.forEach(emp => {
+    const option = document.createElement("option");
+    option.value = emp.name;
+    option.textContent = emp.name;
+    dropdown.appendChild(option);
+  });
+}
+
+function saveAttendance(event) {
+  event.preventDefault();
+
+  const record = {
+    date: document.getElementById("attDate").value,
+    employee: document.getElementById("attEmployee").value,
+    status: document.getElementById("attStatus").value,
+    workHours: Number(document.getElementById("attHours").value),
+    overtime: Number(document.getElementById("attOT").value)
+  };
+
+  attendance.push(record);
+  localStorage.setItem("attendance", JSON.stringify(attendance));
+
+  displayAttendance();
+}
+
+function displayAttendance() {
+  const container = document.getElementById("attendanceList");
+
+  let html = `
+    <table border="1" cellpadding="5">
+      <tr>
+        <th>Date</th>
+        <th>Employee</th>
+        <th>Status</th>
+        <th>Work Hours</th>
+        <th>OT</th>
+      </tr>
+  `;
+
+  attendance.forEach(a => {
+    html += `
+      <tr>
+        <td>${a.date}</td>
+        <td>${a.employee}</td>
+        <td>${a.status}</td>
+        <td>${a.workHours}</td>
+        <td>${a.overtime}</td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+  container.innerHTML = html;
+}

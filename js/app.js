@@ -91,17 +91,21 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function saveEmployee(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const employee = {
-      name: document.getElementById("name").value,
-      type: document.getElementById("type").value,
-      designation: document.getElementById("designation").value
-    };
+  const employee = {
+    name: document.getElementById("name").value,
+    type: document.getElementById("type").value,
+    designation: document.getElementById("designation").value
+  };
 
-    employees.push(employee);
-    displayEmployees();
-  }
+  employees.push(employee);
+
+  // SAVE TO LOCAL STORAGE
+  localStorage.setItem("employees", JSON.stringify(employees));
+
+  displayEmployees();
+}
 
   function displayEmployees() {
     const list = document.getElementById("employeeList");

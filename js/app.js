@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Default page
   loadPage("dashboard");
+  displayEmployees();
 
   // =========================
   // Employee logic

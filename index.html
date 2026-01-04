@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>HRMS | Kosher Infrastructure Pvt Ltd</title>
 
   <!-- Excel -->
@@ -13,16 +13,16 @@
 
   <style>
     body { font-family: Arial, sans-serif; margin: 0; }
-    header { background: #1f2937; color: #fff; padding: 15px; }
-    .container { display: flex; }
-    .sidebar { width: 230px; background: #e5e7eb; min-height: 100vh; }
-    .sidebar li { list-style: none; padding: 12px; cursor: pointer; }
-    .sidebar li:hover { background: #d1d5db; }
-    #content { padding: 20px; width: 100%; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #999; padding: 6px; font-size: 13px; }
-    button { padding: 6px 10px; margin: 4px; }
-    input, select, textarea { width: 300px; }
+    header { background:#1f2937; color:#fff; padding:15px; }
+    .container { display:flex; }
+    nav { width:220px; background:#e5e7eb; min-height:100vh; }
+    nav li { list-style:none; padding:12px; cursor:pointer; }
+    nav li:hover { background:#d1d5db; }
+    #content { padding:20px; width:100%; }
+    table { border-collapse:collapse; width:100%; margin-top:10px; }
+    th,td { border:1px solid #999; padding:6px; font-size:13px; }
+    button { margin:4px; padding:6px 10px; }
+    input, select, textarea { width:300px; }
   </style>
 </head>
 <body>
@@ -33,12 +33,15 @@
 </header>
 
 <div class="container">
-  <ul class="sidebar">
-    <li data-page="employees">Employee Master</li>
-    <li data-page="attendance">Attendance</li>
-    <li data-page="payroll">Payroll</li>
-    <li data-page="reports">Reports</li>
-  </ul>
+  <nav>
+    <ul>
+      <li data-page="dashboard">Dashboard</li>
+      <li data-page="employees">Employee Master</li>
+      <li data-page="attendance">Attendance</li>
+      <li data-page="payroll">Payroll</li>
+      <li data-page="reports">Reports</li>
+    </ul>
+  </nav>
   <main id="content"></main>
 </div>
 

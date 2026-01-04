@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // =========================
+  // Global state
+  // =========================
+  let employees = JSON.parse(localStorage.getItem("employees")) || [];
 
   const content = document.getElementById("content");
 
@@ -60,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Employee logic
   // =========================
 
-  let employees = JSON.parse(localStorage.getItem("employees")) || [];
 
   function showEmployeeForm() {
     const section = document.getElementById("employeeSection");

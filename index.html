@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>HRMS | Kosher Infrastructure Pvt Ltd</title>
 
   <!-- Excel -->
@@ -11,22 +12,24 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
-    body { font-family: Arial; margin: 0; }
-    header { background:#1f2937; color:#fff; padding:15px; }
-    .container { display:flex; }
-    .sidebar { width:220px; background:#e5e7eb; min-height:100vh; }
-    .sidebar li { list-style:none; padding:12px; cursor:pointer; }
-    .sidebar li:hover { background:#d1d5db; }
-    #content { padding:20px; width:100%; }
-    table { border-collapse:collapse; width:100%; }
-    th,td { border:1px solid #999; padding:6px; }
+    body { font-family: Arial, sans-serif; margin: 0; }
+    header { background: #1f2937; color: #fff; padding: 15px; }
+    .container { display: flex; }
+    .sidebar { width: 230px; background: #e5e7eb; min-height: 100vh; }
+    .sidebar li { list-style: none; padding: 12px; cursor: pointer; }
+    .sidebar li:hover { background: #d1d5db; }
+    #content { padding: 20px; width: 100%; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #999; padding: 6px; font-size: 13px; }
+    button { padding: 6px 10px; margin: 4px; }
+    input, select, textarea { width: 300px; }
   </style>
 </head>
 <body>
 
 <header>
   <h2>Kosher Infrastructure Pvt Ltd</h2>
-  <p>HRMS & Payroll System</p>
+  <p>HRMS & Statutory Payroll System</p>
 </header>
 
 <div class="container">
@@ -34,6 +37,7 @@
     <li data-page="employees">Employee Master</li>
     <li data-page="attendance">Attendance</li>
     <li data-page="payroll">Payroll</li>
+    <li data-page="reports">Reports</li>
   </ul>
   <main id="content"></main>
 </div>

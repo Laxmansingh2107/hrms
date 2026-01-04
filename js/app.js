@@ -45,7 +45,7 @@ function showEmployeeForm() {
 
   section.innerHTML = `
     <h3>Add Employee</h3>
-    <form id="employeeForm">
+    <form id="employeeForm" onsubmit="saveEmployee(event)">
       <label>Name</label><br />
       <input type="text" id="name" required /><br /><br />
 
@@ -63,7 +63,7 @@ function showEmployeeForm() {
 
     <div id="employeeList"></div>
   `;
-
+}
   document
     .getElementById("employeeForm")
     .addEventListener("submit", saveEmployee);

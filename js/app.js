@@ -37,3 +37,58 @@ function loadPage(page) {
     `;
   }
 }
+
+let employees = [];
+
+function showEmployeeForm() {
+  const section = document.getElementById("employeeSection");
+
+  section.innerHTML = `
+    <h3>Add Employee</h3>
+    <form id="employeeForm">
+      <label>Name</label><br />
+      <input type="text" id="name" required /><br /><br />
+
+      <label>Employee Type</label><br />
+      <select id="type">
+        <option value="On-roll">On-roll</option>
+        <option value="Contractual">Contractual</option>
+      </select><br /><br />
+
+      <label>Designation</label><br />
+      <input type="text" id="designation" /><br /><br />
+
+      <button type="submit">Save</button>
+    </form>
+
+    <div id="employeeList"></div>
+  `;
+
+  document
+    .getElementById("employeeForm")
+    .addEventListener("submit", saveEmployee);
+}
+function saveEmployee(event) {
+  event.preventDefault();
+
+  const employee = {
+    name: document.getElementById("name").value,
+    type: document.getElementById("type").value,
+    designation: document.getElementById("designation").value
+  };
+
+  employees.push(employee);
+  displayEmployees();
+}
+
+function displayEmployees() {
+  const list = document.getElementById("employeeList");
+
+  let html = "<h3>Employee List</h3><ul>";
+  employees.forEach((emp, index) => {
+    html += `<li>${index + 1}. ${emp.name} – ${emp.type} – ${emp.designation}</li>`;
+  });
+  html += "</ul>";
+
+  list.innerHTML = html;
+}

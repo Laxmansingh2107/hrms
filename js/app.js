@@ -1,261 +1,174 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-  /* =========================
-     GLOBAL STATE
-  ========================== */
   let employees = JSON.parse(localStorage.getItem("employees")) || [];
   let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
 
-  const STANDARD_HOURS = 8;
-  const BASIC_DAILY_RATE = 600;   // can be changed per employee later
-  const OT_RATE_PER_HOUR = 100;
+  const PF_RATE = 0.12;
+  const PF_CEILING = 15000;
+  const ESIC_EMP = 0.0075;
+  const ESIC_EMPR = 0.0325;
+  const ESIC_CEILING = 21000;
 
   const content = document.getElementById("content");
 
-  /* =========================
-     NAVIGATION
-  ========================== */
-  document.querySelectorAll(".sidebar li").forEach(item => {
-    item.addEventListener("click", () => {
-      loadPage(item.dataset.page);
-    });
+  document.querySelectorAll(".sidebar li").forEach(li => {
+    li.onclick = () => loadPage(li.dataset.page);
   });
 
-  loadPage("dashboard");
+  loadPage("employees");
 
-  /* =========================
-     PAGE LOADER
-  ========================== */
   function loadPage(page) {
-
-    if (page === "dashboard") {
-      content.innerHTML = `
-        <h2>Dashboard</h2>
-        <p>Total Employees: ${employees.length}</p>
-        <p>Total Attendance Records: ${attendance.length}</p>
-      `;
-    }
-
-    if (page === "employees") {
-      content.innerHTML = `
-        <h2>Employees</h2>
-        <button id="addEmployeeBtn">Add Employee</button>
-        <div id="employeeSection"></div>
-        <div id="employeeList"></div>
-      `;
-      document.getElementById("addEmployeeBtn")
-        .addEventListener("click", showEmployeeForm);
-      displayEmployees();
-    }
-
-    if (page === "attendance") {
-      content.innerHTML = `
-        <h2>Attendance</h2>
-
-        <form id="attendanceForm">
-          <label>Date</label><br/>
-          <input type="date" id="attDate" required /><br/><br/>
-
-          <label>Employee</label><br/>
-          <select id="attEmployee"></select><br/><br/>
-
-          <label>Status</label><br/>
-          <select id="attStatus">
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-            <option value="Leave">Leave</option>
-          </select><br/><br/>
-
-          <label>In Time</label><br/>
-          <input type="time" id="inTime"/><br/><br/>
-
-          <label>Out Time</label><br/>
-          <input type="time" id="outTime"/><br/><br/>
-
-          <label>Work Hours</label><br/>
-          <input type="number" id="attHours" readonly /><br/><br/>
-
-          <label>Overtime Hours</label><br/>
-          <input type="number" id="attOT" readonly /><br/><br/>
-
-          <button type="submit">Save Attendance</button>
-        </form>
-
-        <h3>Attendance Register</h3>
-        <div id="attendanceList"></div>
-      `;
-
-      document.getElementById("attDate").value =
-        new Date().toISOString().split("T")[0];
-
-      populateEmployeeDropdown();
-      document.getElementById("inTime").addEventListener("change", calculateHours);
-      document.getElementById("outTime").addEventListener("change", calculateHours);
-      document.getElementById("attendanceForm")
-        .addEventListener("submit", saveAttendance);
-
-      displayAttendance();
-    }
-
-    if (page === "payroll") {
-      generatePayroll();
-    }
-
-    if (page === "reports") {
-      content.innerHTML = `
-        <h2>Reports</h2>
-        <p>Attendance Register and Payroll Sheet are audit-ready.</p>
-        <p>CSV / Excel export can be added next.</p>
-      `;
-    }
+    if (page === "employees") renderEmployees();
+    if (page === "attendance") renderAttendance();
+    if (page === "payroll") renderPayroll();
   }
 
-  /* =========================
-     EMPLOYEES
-  ========================== */
-  function showEmployeeForm() {
-    document.getElementById("employeeSection").innerHTML = `
-      <form id="employeeForm">
-        <label>Name</label><br/>
-        <input type="text" id="name" required /><br/><br/>
+  /* ================= EMPLOYEE MASTER ================= */
 
-        <label>Type</label><br/>
-        <select id="type">
-          <option>On-roll</option>
-          <option>Contractual</option>
-        </select><br/><br/>
-
-        <label>Designation</label><br/>
-        <input type="text" id="designation" /><br/><br/>
-
-        <button type="submit">Save</button>
-      </form>
+  function renderEmployees() {
+    content.innerHTML = `
+      <h3>Employee Master</h3>
+      <button onclick="addEmployee()">Add Employee</button>
+      <div id="empList"></div>
     `;
-    document.getElementById("employeeForm")
-      .addEventListener("submit", saveEmployee);
+    drawEmployeeList();
   }
 
-  function saveEmployee(e) {
-    e.preventDefault();
+  window.addEmployee = function () {
+    content.innerHTML = `
+      <h3>Add Employee</h3>
+      Name <input id="name"><br><br>
+      Basic <input id="basic" type="number"><br><br>
+      PF Applicable <input type="checkbox" id="pf"><br>
+      ESIC Applicable <input type="checkbox" id="esic"><br><br>
+      TDS (Monthly) <input id="tds" type="number"><br><br>
+      PT (Monthly) <input id="pt" type="number"><br><br>
+      <button onclick="saveEmployee()">Save</button>
+    `;
+  };
+
+  window.saveEmployee = function () {
     employees.push({
+      empId: "EMP" + (employees.length + 1),
       name: name.value,
-      type: type.value,
-      designation: designation.value
+      statutory: {
+        pfApplicable: pf.checked,
+        esicApplicable: esic.checked,
+        tdsMonthly: Number(tds.value || 0),
+        ptMonthly: Number(pt.value || 0)
+      },
+      salary: {
+        basic: Number(basic.value),
+        hra: 0,
+        allowance: 0
+      }
     });
     localStorage.setItem("employees", JSON.stringify(employees));
-    displayEmployees();
-  }
+    renderEmployees();
+  };
 
-  function displayEmployees() {
-    const list = document.getElementById("employeeList");
-    if (!list) return;
-    list.innerHTML = "<h3>Employee List</h3><ul>" +
-      employees.map((e,i)=>`<li>${i+1}. ${e.name} – ${e.type}</li>`).join("")
-      + "</ul>";
-  }
-
-  /* =========================
-     ATTENDANCE
-  ========================== */
-  function populateEmployeeDropdown() {
-    const d = document.getElementById("attEmployee");
-    d.innerHTML = "";
-    employees.forEach(e=>{
-      const o=document.createElement("option");
-      o.textContent=e.name;
-      d.appendChild(o);
+  function drawEmployeeList() {
+    let html = `<table><tr><th>ID</th><th>Name</th><th>Basic</th></tr>`;
+    employees.forEach(e => {
+      html += `<tr><td>${e.empId}</td><td>${e.name}</td><td>${e.salary.basic}</td></tr>`;
     });
+    html += `</table>`;
+    document.getElementById("empList").innerHTML = html;
   }
 
-  function calculateHours() {
-    if (!inTime.value || !outTime.value) return;
+  /* ================= ATTENDANCE ================= */
 
-    let [ih,im]=inTime.value.split(":").map(Number);
-    let [oh,om]=outTime.value.split(":").map(Number);
-
-    let start = ih*60+im;
-    let end = oh*60+om;
-    if (end < start) end += 1440; // night shift
-
-    let hours=(end-start)/60;
-    attHours.value=Math.min(hours,STANDARD_HOURS).toFixed(2);
-    attOT.value=Math.max(hours-STANDARD_HOURS,0).toFixed(2);
+  function renderAttendance() {
+    content.innerHTML = `
+      <h3>Attendance</h3>
+      Employee <select id="emp"></select><br><br>
+      Date <input type="date" id="date"><br><br>
+      <button onclick="saveAttendance()">Mark Present</button>
+    `;
+    emp.innerHTML = employees.map(e =>
+      `<option value="${e.empId}">${e.name}</option>`
+    ).join("");
   }
 
-  function saveAttendance(e) {
-    e.preventDefault();
+  window.saveAttendance = function () {
     attendance.push({
-      date: attDate.value,
-      employee: attEmployee.value,
-      status: attStatus.value,
-      inTime: inTime.value,
-      outTime: outTime.value,
-      workHours: Number(attHours.value),
-      overtime: Number(attOT.value)
+      empId: emp.value,
+      date: date.value
     });
     localStorage.setItem("attendance", JSON.stringify(attendance));
-    displayAttendance();
+    alert("Saved");
+  };
+
+  /* ================= PAYROLL ================= */
+
+  function renderPayroll() {
+    content.innerHTML = `
+      <h3>Payroll</h3>
+      Month (YYYY-MM) <input id="month">
+      <button onclick="runPayroll()">Run</button>
+      <div id="payrollArea"></div>
+    `;
   }
 
-  function displayAttendance() {
-    const c=document.getElementById("attendanceList");
-    if (!c) return;
-    if (!attendance.length) {
-      c.innerHTML="<p>No attendance records.</p>";
-      return;
-    }
-    c.innerHTML=`
-      <table border="1">
-        <tr>
-          <th>Date</th><th>Employee</th><th>Status</th>
-          <th>In</th><th>Out</th><th>Work</th><th>OT</th>
-        </tr>
-        ${attendance.map(a=>`
-          <tr>
-            <td>${a.date}</td><td>${a.employee}</td><td>${a.status}</td>
-            <td>${a.inTime||"-"}</td><td>${a.outTime||"-"}</td>
-            <td>${a.workHours}</td><td>${a.overtime}</td>
-          </tr>`).join("")}
-      </table>`;
-  }
+  window.runPayroll = function () {
+    let m = month.value;
+    let rows = employees.map(emp => {
 
-  /* =========================
-     PAYROLL (MONTHLY)
-  ========================== */
-  function generatePayroll() {
-    let payroll = {};
+      let days = attendance.filter(a =>
+        a.empId === emp.empId && a.date.startsWith(m)
+      ).length;
 
-    attendance.forEach(a=>{
-      if (a.status!=="Present") return;
-      if (!payroll[a.employee])
-        payroll[a.employee]={days:0,ot:0};
-      payroll[a.employee].days+=1;
-      payroll[a.employee].ot+=a.overtime;
+      let basicEarned = (emp.salary.basic / 26) * days;
+
+      let variableConv = Number(prompt(`Variable Conveyance for ${emp.name}`, 0));
+
+      let gross = basicEarned + variableConv;
+
+      let pfWage = Math.min(emp.salary.basic, PF_CEILING);
+      let pfEmp = emp.statutory.pfApplicable ? pfWage * PF_RATE : 0;
+      let pfEmpr = pfEmp;
+
+      let esicEmp = (emp.statutory.esicApplicable && gross <= ESIC_CEILING)
+        ? gross * ESIC_EMP : 0;
+      let esicEmpr = (emp.statutory.esicApplicable && gross <= ESIC_CEILING)
+        ? gross * ESIC_EMPR : 0;
+
+      let net = gross - pfEmp - esicEmp - emp.statutory.ptMonthly - emp.statutory.tdsMonthly;
+
+      return {
+        emp: emp.name,
+        gross: Math.round(gross),
+        pfEmp: Math.round(pfEmp),
+        pfEmpr: Math.round(pfEmpr),
+        esicEmp: Math.round(esicEmp),
+        esicEmpr: Math.round(esicEmpr),
+        pt: emp.statutory.ptMonthly,
+        tds: emp.statutory.tdsMonthly,
+        net: Math.round(net)
+      };
     });
 
-    content.innerHTML=`
-      <h2>Payroll Sheet</h2>
-      <table border="1">
-        <tr>
-          <th>Employee</th>
-          <th>Days Worked</th>
-          <th>Basic Pay</th>
-          <th>OT Pay</th>
-          <th>Gross Pay</th>
-        </tr>
-        ${Object.entries(payroll).map(([e,p])=>{
-          let basic=p.days*BASIC_DAILY_RATE;
-          let ot=p.ot*OT_RATE_PER_HOUR;
-          return `<tr>
-            <td>${e}</td>
-            <td>${p.days}</td>
-            <td>${basic}</td>
-            <td>${ot}</td>
-            <td>${basic+ot}</td>
-          </tr>`;
-        }).join("")}
-      </table>
-    `;
+    drawPayroll(rows);
+  };
+
+  function drawPayroll(rows) {
+    let html = `<table>
+      <tr>
+        <th>Name</th><th>Gross</th>
+        <th>PF (Emp)</th><th>PF (Empr)</th>
+        <th>ESIC (Emp)</th><th>ESIC (Empr)</th>
+        <th>PT</th><th>TDS</th><th>Net</th>
+      </tr>`;
+    rows.forEach(r => {
+      html += `<tr>
+        <td>${r.emp}</td><td>${r.gross}</td>
+        <td>${r.pfEmp}</td><td>${r.pfEmpr}</td>
+        <td>${r.esicEmp}</td><td>${r.esicEmpr}</td>
+        <td>${r.pt}</td><td>${r.tds}</td><td>${r.net}</td>
+      </tr>`;
+    });
+    html += `</table>`;
+    payrollArea.innerHTML = html;
   }
 
 });

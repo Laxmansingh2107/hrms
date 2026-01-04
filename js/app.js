@@ -15,16 +15,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (page === "employees") {
-      content.innerHTML = `
-        <h2>Employees</h2>
-        <button id="addEmployeeBtn">Add Employee</button>
-        <div id="employeeSection"></div>
-      `;
+  content.innerHTML = `
+    <h2>Employees</h2>
+    <button id="addEmployeeBtn">Add Employee</button>
 
-      document
-        .getElementById("addEmployeeBtn")
-        .addEventListener("click", showEmployeeForm);
-    }
+    <div id="employeeSection"></div>
+    <div id="employeeList"></div>
+  `;
+
+  document
+    .getElementById("addEmployeeBtn")
+    .addEventListener("click", showEmployeeForm);
+
+  // 👇 ALWAYS show existing employees
+  displayEmployees();
+}
 
     if (page === "attendance") {
       content.innerHTML = `

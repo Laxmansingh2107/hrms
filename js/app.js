@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Employee logic
   // =========================
 
-  let employees = [];
+  let employees = JSON.parse(localStorage.getItem("employees")) || [];
 
   function showEmployeeForm() {
     const section = document.getElementById("employeeSection");

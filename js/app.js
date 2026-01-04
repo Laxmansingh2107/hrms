@@ -1,4 +1,4 @@
-function loadPage(page) {
+window.loadPage = function (page) {
   const content = document.getElementById("content");
 
   if (page === "dashboard") {
